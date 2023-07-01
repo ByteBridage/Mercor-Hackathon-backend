@@ -33,8 +33,6 @@ model User {
 
   competitionList UserCompetitionMap[]
   tournamentList  UserTournamentMap[]
-  // Tournament       Tournament?  @relation(fields: [tournamentId], references: [id])
-  // tournamentId     String?      @db.ObjectId
 
   @@map("users")
 }
@@ -89,12 +87,15 @@ model Competition {
 
   startTime DateTime
   endTime DateTime
-  
+
   problems Problem[]
   participants UserCompetitionMap[]
 
   tournamentId String     @db.ObjectId
   Tournament   Tournament @relation(fields: [tournamentId], references: [id])
+
+  topSelections Int @default(3)
+
 
   successorId String        @unique @db.ObjectId
   successor   Competition?  @relation("PredecessorRelation", fields: [successorId], references: [id], onUpdate: NoAction, onDelete: NoAction)
@@ -115,6 +116,8 @@ model Problem {
   current_question TestQuestion @relation(fields: [questionId], references: [id])
 
   completed Boolean
+
+  @@map("problems")
 }
 
 
@@ -130,7 +133,7 @@ model TestQuestion {
   // optional mapping
   competitions CompetitionProblemMap[]
 
-  @@map("problems")
+  @@map("questions")
 }
 
 
@@ -144,6 +147,8 @@ model TestCase {
   problem   TestQuestion @relation(fields: [problemId], references: [id])
 
   SampleCase SampleCase?
+
+  @@map("testcases")
 }
 
 model SampleCase {
@@ -152,6 +157,8 @@ model SampleCase {
   description String
   testcaseId  String   @unique @db.ObjectId
   testcase    TestCase @relation(fields: [testcaseId], references: [id])
+
+  @@map("samplecases")
 }
 
 
@@ -170,6 +177,8 @@ model UserCompetitionMap {
 
   score Int // Decimal not supported in mongoDB :)
 
+  @@map("user-competition-maps")
+
 }
 
 model UserTournamentMap {
@@ -180,4 +189,6 @@ model UserTournamentMap {
 
   tournamentId String     @db.ObjectId
   tournament   Tournament @relation(fields: [tournamentId], references: [id])
+
+  @@map("user-tournament-maps")
 }
