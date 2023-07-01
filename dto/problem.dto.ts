@@ -9,7 +9,8 @@ export interface CreateProblemDTO {
 
 export interface TestCaseDTO {
     input: string;
-    output: string
+    output: string;
+    description?: string;
 }
 
 

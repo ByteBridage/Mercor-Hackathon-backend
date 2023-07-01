@@ -117,11 +117,35 @@ export async function getCompetitionLeaderboard(competitionId: string) {
     }
 }
 
+/**
+ * Gets the tournaments which user has registered in, are ongoing as well
+ */
+export async function getActiveTournament(userId: string): Promise<Tournament[]> {
+    return null
+}
+
+
+
+export async function getUserTournamentCompetition(userId: string, tournamentId: string): Promise<string> {
+    try {
+        return null
+    } catch(err: any) {
+        return null
+    }
+}
 
 
 export async function getCompetitionProblems(competitionId: string): Promise<Problem[]> {
     try {
+        let problems = db.problem.findMany({
+            where: { competitionId: competitionId }
+        });
+        if(!problems) {
+            logger.error("Problems could not be retrieved");
+            return null;
+        }
 
+        return problems;
     } catch(err) {
         logger.error("Failed to get competition problems");
         return null;
@@ -132,18 +156,68 @@ export async function getCompetitionProblems(competitionId: string): Promise<Pro
  * Returns the details of competition winners
  * @param competitionId 
  */
-// export async function getCompetitionWinners(competitionId: string): Promise<ExportUserInfoDTO[]> {
-//     try {
-//     } catch(err) {
+export async function getCompetitionWinners(competitionId: string): Promise<{user: ExportUserInfoDTO, score: number}[]> {
+    try {
+        let competition = await db.competition.findUnique({
+            where: {id: competitionId}
+        });
+        if(!competition) {
+            logger.error("Failed to get the competition")
+            return null;
+        }
 
-//     }
-// }
+        let leaderboard = await getCompetitionLeaderboard(competitionId);
+        if(!leaderboard) {
+            logger.error("Failed to get the leaderboard")
+            return null;
+        }
+
+        return leaderboard.slice(0, competition.topSelections);
+    } catch(err) {
+
+    }
+}
 
 
 /**
  * Ends the competition and passes on the winners to the next round of competition
  * @param competitionId 
  */
-export async function concludeCompetition(competitionId: string) {
+// @Incomplete
+export async function concludeCompetition(competitionId: string): Promise<Boolean> {
+    try {
+        let winners = await getCompetitionWinners(competitionId);
+        if(!winners) {
+            logger.error("Cannot fetch winners");
+            return false;
+        }
 
+        let competition = await db.competition.findUnique({
+            where: {id: competitionId}
+        });
+        if(!competition) {
+            logger.error("Cannot fetch competition details");
+            return false;
+        }
+
+        // let successor_competition = db.competition.update({
+        //     where: { id: competition.successorId },
+        //     data: {
+        //         participants: {
+        //             create: {
+                        
+        //             }
+        //         }
+        //     }
+        // })
+    } catch(err: any) {
+        logger.error("Failed to conclude competition")
+    }
 } 
+
+
+
+
+export async function processSubmission() {
+
+}

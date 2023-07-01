@@ -11,7 +11,7 @@ import { createUser } from '../services/user.service';
 
 dotenv.config();
 
-
+// @Checked: Works
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { userData } = req.body;
@@ -60,6 +60,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+
+
+// @Checked: Works
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;

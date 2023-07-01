@@ -64,11 +64,11 @@ export async function createTournament(tournamentData: TournamentDTO, companyId:
     try {
         let new_tournament = await db.tournament.create({
             data: {
-                 name: tournamentData.name,
-                 description: tournamentData.description,
-                 startDate: tournamentData.startDate,
-                 endDate: tournamentData.endDate,
-                 companyId: companyId
+                name: tournamentData.name,
+                description: tournamentData.description,
+                startDate: tournamentData.startDate,
+                endDate: tournamentData.endDate,
+                companyId: companyId
             }
         });
 

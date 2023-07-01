@@ -42,11 +42,12 @@ export async function addParticipant(userId: string, tournamentId: string): Prom
             return false;
         }
 
+
         
         let updatedTournament: Tournament = await db.tournament.update({
             where: { id: tournamentId },
             data: {
-                registered_users: {
+                registered_users: { // Might not work, because im editing an array
                     create: { // This is not creating a user, its creating a user-tournament mapping
                         userId: userId,
                     }
@@ -89,6 +90,10 @@ export async function fetchUserInfoByEmail(email): Promise<ExportUserInfoDTO> {
     }
 }
 
+
+export async function getUserCompetitions() {
+
+}
 
 // try {
 

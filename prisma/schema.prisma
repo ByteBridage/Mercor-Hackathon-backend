@@ -39,6 +39,7 @@ model User {
 
   competitionList UserCompetitionMap[]
   tournamentList  UserTournamentMap[]
+  UserProblemMap  UserProblemMap[]
 
   @@map("users")
 }
@@ -117,10 +118,9 @@ model Problem {
   competitionId String      @db.ObjectId
   competition   Competition @relation(fields: [competitionId], references: [id])
 
-  questionId       String       @db.ObjectId
-  current_question TestQuestion @relation(fields: [questionId], references: [id])
-
-  completed Boolean
+  questionId     String           @db.ObjectId
+  questionData   TestQuestion     @relation(fields: [questionId], references: [id])
+  UserProblemMap UserProblemMap[]
 
   @@map("problems")
 }
@@ -188,4 +188,16 @@ model UserTournamentMap {
   tournament   Tournament @relation(fields: [tournamentId], references: [id])
 
   @@map("user-tournament-maps")
+}
+
+model UserProblemMap {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  problemId String  @db.ObjectId
+  problem   Problem @relation(fields: [problemId], references: [id])
+
+  completed Boolean @default(false)
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
 }
