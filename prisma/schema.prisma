@@ -86,16 +86,15 @@ model Competition {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
   startTime DateTime
-  endTime DateTime
+  endTime   DateTime
 
-  problems Problem[]
+  problems     Problem[]
   participants UserCompetitionMap[]
 
   tournamentId String     @db.ObjectId
   Tournament   Tournament @relation(fields: [tournamentId], references: [id])
 
   topSelections Int @default(3)
-
 
   successorId String        @unique @db.ObjectId
   successor   Competition?  @relation("PredecessorRelation", fields: [successorId], references: [id], onUpdate: NoAction, onDelete: NoAction)
@@ -104,23 +103,20 @@ model Competition {
   @@map("competitions")
 }
 
-
 // Submissions from users will come on problemID. We will check if user is in competition, if yes, 
 model Problem {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  competitionId String @db.ObjectId
-  competition Competition @relation(fields: [competitionId], references: [id])
+  competitionId String      @db.ObjectId
+  competition   Competition @relation(fields: [competitionId], references: [id])
 
-  questionId String @db.ObjectId
+  questionId       String       @db.ObjectId
   current_question TestQuestion @relation(fields: [questionId], references: [id])
 
   completed Boolean
 
   @@map("problems")
 }
-
-
 
 model TestQuestion {
   id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -129,13 +125,10 @@ model TestQuestion {
   description String
 
   testcases TestCase[]
-
-  // optional mapping
-  competitions CompetitionProblemMap[]
+  Problem   Problem[]
 
   @@map("questions")
 }
-
 
 model TestCase {
   id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -143,7 +136,7 @@ model TestCase {
   input  String
   output String
 
-  problemId String  @db.ObjectId
+  problemId String       @db.ObjectId
   problem   TestQuestion @relation(fields: [problemId], references: [id])
 
   SampleCase SampleCase?
@@ -161,9 +154,7 @@ model SampleCase {
   @@map("samplecases")
 }
 
-
 // M-N Schema mapping
-
 
 model UserCompetitionMap {
   id String @id @default(auto()) @map("_id") @db.ObjectId
@@ -178,7 +169,6 @@ model UserCompetitionMap {
   score Int // Decimal not supported in mongoDB :)
 
   @@map("user-competition-maps")
-
 }
 
 model UserTournamentMap {
