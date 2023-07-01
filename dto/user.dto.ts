@@ -1,3 +1,5 @@
+import { User } from "@prisma/client";
+
 export interface CreateUserDTO {
     username: string;
     password: string;
@@ -14,7 +16,7 @@ export interface CreateUserDTO {
     age?: Number
 }
 
-export interface GetUserInfoDTO {
+export interface ExportUserInfoDTO {
     username: string;
     email: string;
 
@@ -22,5 +24,10 @@ export interface GetUserInfoDTO {
     last_name: string;
 
     age?: Number
+}
+
+
+export function mapExportUserDTO(element: User): ExportUserInfoDTO {
+    return {...element}
 }
 

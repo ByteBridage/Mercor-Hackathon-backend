@@ -6,7 +6,7 @@ import db from "./../modules/db.module"
 
 const logger = console;
 
-export async function createOrganizer(organizerData: CreateOrganizerDTO) {
+export async function createOrganizer(organizerData: CreateOrganizerDTO): Promise<Company> {
     try {
         let organizer: Company = await db.company.create({
             data: {
@@ -23,9 +23,38 @@ export async function createOrganizer(organizerData: CreateOrganizerDTO) {
             logger.error("Failed to create organizer")
             return null;
         }
-        
+
+        return organizer;
+
     } catch(err: any) {
         logger.error("Failed to create Organizer");
+        return null;
+    }
+}
+
+export async function updateOrganizerProfile(organizerId: string, organizerData: CreateOrganizerDTO): Promise<Boolean> {    
+    try {
+        let organizer: Company = await db.company.update({
+            where: { id: organizerId },
+            data: {
+                company_name: organizerData.organizer_name,
+                username: organizerData.username,
+                email: organizerData.email,
+                password: organizerData.password,
+                pincode: organizerData.pincode,
+                office_address: organizerData.office_address
+            }
+        });
+
+        if(!organizer) {
+            logger.error("Failed to create organizer")
+            return false;
+        }
+
+        return true;
+
+    } catch(err) {
+        logger.error("Failed to Update organizer")
         return null;
     }
 }
@@ -51,17 +80,7 @@ export async function createTournament(tournamentData: TournamentDTO, companyId:
 }
 
 
-// Close the registration for the tournaments
-export async function closeTournamentRegistrations(tournamentId: string) {
 
-}
-
-
-// Create levels of competitions by equally dividing the participants
-// in each competition
-async function createCompetitionsInTournaments(tournamentId: string) {
-
-}
 
 
 
