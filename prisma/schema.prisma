@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// // // // // // // 
+//
+// Interface Schemas
+//
+// // // // // // //
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // credentials
+  username String @unique
+  email    String @unique
+  password String
+
+  // account details
+  first_name String
+  last_name  String
+  age        Int?
+  created_at DateTime? @default(now())
+
+  details_complete Boolean @default(false)
+
+  competitionList UserCompetitionMap[]
+  tournamentList  UserTournamentMap[]
+  // Tournament       Tournament?  @relation(fields: [tournamentId], references: [id])
+  // tournamentId     String?      @db.ObjectId
+
+  @@map("users")
+}
+
+model Company {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // credentials
+  username String
+  email    String
+  password String
+
+  company_name   String
+  office_address String
+  pincode        String
+
+  created_at DateTime? @default(now())
+
+  tournaments Tournament[]
+}
+
+// // // // // // // 
+//
+// Functional Schemas
+//
+// // // // // // //
+
+model Tournament {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // meta data
+  name        String
+  description String
+  posterImg   String // Aws Bucket 
+
+  // competitions involved
+  competitions     Competition[]
+  registered_users UserTournamentMap[]
+  tags             String[]
+  startDate        DateTime
+  endDate          DateTime?
+
+  // parent mapping 
+  Company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @db.ObjectId
+
+  @@map("tournaments")
+}
+
+model Competition {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  startTime DateTime
+  endTime DateTime
+  
+  problems Problem[]
+  participants UserCompetitionMap[]
+
+  tournamentId String     @db.ObjectId
+  Tournament   Tournament @relation(fields: [tournamentId], references: [id])
+
+  successorId String        @unique @db.ObjectId
+  successor   Competition?  @relation("PredecessorRelation", fields: [successorId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  predecessor Competition[] @relation("PredecessorRelation")
+
+  @@map("competitions")
+}
+
+
+// Submissions from users will come on problemID. We will check if user is in competition, if yes, 
+model Problem {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  competitionId String @db.ObjectId
+  competition Competition @relation(fields: [competitionId], references: [id])
+
+  questionId String @db.ObjectId
+  current_question TestQuestion @relation(fields: [questionId], references: [id])
+
+  completed Boolean
+}
+
+
+
+model TestQuestion {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name        String
+  description String
+
+  testcases TestCase[]
+
+  // optional mapping
+  competitions CompetitionProblemMap[]
+
+  @@map("problems")
+}
+
+
+model TestCase {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  input  String
+  output String
+
+  problemId String  @db.ObjectId
+  problem   TestQuestion @relation(fields: [problemId], references: [id])
+
+  SampleCase SampleCase?
+}
+
+model SampleCase {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  description String
+  testcaseId  String   @unique @db.ObjectId
+  testcase    TestCase @relation(fields: [testcaseId], references: [id])
+}
+
+
+// M-N Schema mapping
+
+
+model UserCompetitionMap {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  // mappings
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  competitionId String      @db.ObjectId
+  competition   Competition @relation(fields: [competitionId], references: [id])
+
+  score Int // Decimal not supported in mongoDB :)
+
+}
+
+model UserTournamentMap {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  userId String @db.ObjectId
+  user   User   @relation(fields: [userId], references: [id])
+
+  tournamentId String     @db.ObjectId
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+}
