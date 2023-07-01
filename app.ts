@@ -3,10 +3,11 @@ import { SetupSystem } from './config/initialiser.setup';
 import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth.routes';
 import * as initialisers from "./initialisers"
-import * as dotenv from "dotenv"
 import cors from "cors"
 
-dotenv.config();
+require("dotenv").config({
+    path: "./"
+});
 
 // Create an instance of the Express application
 const app: Application = express();
