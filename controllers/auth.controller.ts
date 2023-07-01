@@ -3,19 +3,22 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
+import db from "./../modules/db.module"
 import dotenv from "dotenv";
+
+import { createUser } from '../services/user.service';
 
 dotenv.config();
 
-const prisma = new PrismaClient();
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, email, password } = req.body;
+    const { userData } = req.body;
+    const { username, email, password } = userData
 
     // Check if the user already exists
-    const existingUser: User | null = await prisma.user.findUnique({ where: { email } });
+    const existingUser: User | null = await db.user.findUnique({ where: { email } });
     if (existingUser) {
       res.status(400).json({ message: 'User already exists' });
       return;
@@ -24,7 +27,23 @@ export const register = async (req: Request, res: Response): Promise<void> => {
     // Hash the password
     const hashedPassword: string = await bcrypt.hash(password, 10);
 
-    // const newUser: User = await prisma.user.create({
+
+    // Creating a new user
+    let user = await createUser({
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      username: username,
+      password: hashedPassword,
+      email: email
+    })
+
+    if(!user){
+      res.status(301).json({ message: 'Failed to create user' });
+      return;
+    }
+
+  
+    // const newUser: User = await db.user.create({
     //   data: {
     //     username,
     //     email,
@@ -32,7 +51,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   
     // });
 
-    // res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: 'User registered successfully' });
+
+
+
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -43,7 +65,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const { email, password } = req.body;
 
     // Check if the user exists
-    const user: User | null = await prisma.user.findUnique({ where: { email } });
+    const user: User | null = await db.user.findUnique({ where: { email } });
     if (!user) {
       res.status(401).json({ message: 'Invalid email or password' });
       return;

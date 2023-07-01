@@ -1,6 +1,5 @@
 import express, { Application, Request, Response, NextFunction } from 'express';
 import { SetupSystem } from './config/initialiser.setup';
-import { PrismaClient } from '@prisma/client';
 import authRoutes from './routes/auth.routes';
 import * as initialisers from "./initialisers"
 import cors from "cors"
@@ -12,8 +11,6 @@ require("dotenv").config({
 // Create an instance of the Express application
 const app: Application = express();
 
-//Init Prisma Client
-const prisma = new PrismaClient();
 
 // Configuring Initialisers
 let initialiserMethods = Object.values(initialisers);
