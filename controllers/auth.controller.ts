@@ -4,6 +4,9 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaClient, User } from '@prisma/client';
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const prisma = new PrismaClient();
 
@@ -29,7 +32,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   
     // });
 
-    res.status(201).json({ message: 'User registered successfully' });
+    // res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -54,7 +57,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Generate a JWT
-    const token: string = jwt.sign({ userId: user.id }, 'your_secret_key');
+    const token: string = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
 
     res.status(200).json({ token });
   } catch (error) {
