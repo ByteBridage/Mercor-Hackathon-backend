@@ -1,13 +1,15 @@
-import mongoose from "mongoose";
+import db from "./../modules/db.module"
+
 
 const logger = console;
 
 export default async function initialise () {
     try {
-        logger.log(process.env.DB_URL)
-        await mongoose.connect(String(process.env.DB_URL));
+        logger.log(process.env.DATABASE_URL)
+        await db.$connect();
+        
 
-        logger.log("MongoDB setup complete")
+        logger.log("Database connection successful");
     } catch (err: any) {
         logger.error("Failed to connect to mongoDB: " + err);
         return;        
